@@ -30,8 +30,16 @@ def read_author(author_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Author not found")
     return db_author
 
+
 @app.post("/authors/{author_id}/books/", response_model=schemas.Book)
-def create_book_for_author(author_id: int, book: schemas.BookCreate, db: Session = Depends(get_db)):
+def create_book_for_author(
+        author_id: int,
+        book: schemas.BookCreate,
+        db: Session = Depends(get_db)
+):
+    db_author = crud.get_author(db, author_id=author_id)
+    if db_author is None:
+        raise HTTPException(status_code=404, detail="Author not found")
     return crud.create_author_book(db=db, book=book, author_id=author_id)
 
 @app.get("/books/", response_model=list[schemas.Book])
